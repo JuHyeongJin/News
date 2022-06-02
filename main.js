@@ -9,17 +9,28 @@ menus.forEach((menu) =>
 );
 
 const getNews = async () => {
-  //헤더준비
-  let header = new Headers({
-    "x-api-key": "nZlMohtufaB7zpiLzjKbF8E_IfynocouWHUnQ-_2y8w",
-  });
-  //url 부르기
-  let response = await fetch(url, { headers: header }); //ajax, http, fetch 등 사용가능
-  //데이터 가져오기
-  let data = await response.json();
-  //데이터 보여주기
-  news = data.articles;
-  render();
+  try {
+    //헤더준비
+    let header = new Headers({
+      "x-api-key": "nZlMohtufaB7zpiLzjKbF8E_IfynocouWHUnQ-_2y8w",
+    });
+    //url 부르기
+    let response = await fetch(url, { headers: header }); //ajax, http, fetch 등 사용가능
+    //데이터 가져오기
+    let data = await response.json();
+    if (response.status == 200) {
+      if(data.total_hits == 0){
+        throw new Error("검색된 결과가 없습니다.");
+      }
+      //데이터 보여주기
+      news = data.articles;
+      render();
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    errorRender(error.message);
+  }
 };
 
 const getLatestNews = async () => {
@@ -70,6 +81,11 @@ const render = () => {
     .join("");
 
   document.getElementById("news-board").innerHTML = newsHTML;
+};
+
+const errorRender = (message) => {
+  let errorHTML = `<div class="alert alert-danger text-center" role="alert">${message}</div>`;
+  document.getElementById("news-board").innerHTML = errorHTML;
 };
 
 searchButton.addEventListener("click", getNewsByKeyword);
