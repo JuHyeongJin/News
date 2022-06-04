@@ -100,21 +100,35 @@ const pagination = () => {
   //알아야할 것: 전체 페이지 수, 현재 페이지, 페이지 그룹, 시작과 끝 페이지
   let pageGroup = Math.ceil(page / 5);
   let last = pageGroup * 5;
-  let first = last - 4;
-
-  paginationHTML = `<li class="page-item">
-  <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${page-1})">
-    <span aria-hidden="true">&lt;</span>
-  </a>
-</li>`;
-  for (let i = first; i <= last; i++) {
-    paginationHTML += `<li class="page-item ${page == i ? "active" : ""}"><a class="page-link" href="#" onclick="moveToPage(${i})">${i}</a></li>`;
+  if (last > total_pages) {
+    //마지막 그룹이 5개 이하라면
+    last = total_pages;
   }
-  paginationHTML += `<li class="page-item">
-  <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(${page+1})">
-    <span aria-hidden="true">&gt;</span>
-  </a>
-</li>`;
+  let first = last - 4 <= 0 ? 1 : last - 4; //첫 그룹이 5 이하라면
+
+  if (first >= 6) {
+    paginationHTML = `<li class="page-item" onclick="moveToPage(1)">
+                        <a class="page-link" href='#js-bottom'>&lt;&lt;</a>
+                      </li>
+                      <li class="page-item" onclick="moveToPage(${page - 1})">
+                        <a class="page-link" href='#js-bottom'>&lt;</a>
+                      </li>`;
+  }
+  for (let i = first; i <= last; i++) {
+    paginationHTML += `<li class="page-item ${i == page ? "active" : ""}" >
+                        <a class="page-link" href='#js-bottom' onclick="moveToPage(${i})" >${i}</a>
+                       </li>`;
+  }
+
+  if (last < total_pages) {
+    paginationHTML += `<li class="page-item" onclick="moveToPage(${page + 1})">
+                        <a  class="page-link" href='#js-program-detail-bottom'>&gt;</a>
+                       </li>
+                       <li class="page-item" onclick="moveToPage(${total_pages})">
+                        <a class="page-link" href='#js-bottom'>&gt;&gt;</a>
+                       </li>`;
+  }
+
   document.querySelector(".pagination").innerHTML = paginationHTML;
 };
 
