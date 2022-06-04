@@ -2,6 +2,8 @@
 
 let searchButton = document.getElementById("search-button");
 let news = [];
+let page = 1;
+let total_pages = 0;
 let url = "";
 let menus = document.querySelectorAll(".menus button");
 menus.forEach((menu) =>
@@ -14,17 +16,22 @@ const getNews = async () => {
     let header = new Headers({
       "x-api-key": "nZlMohtufaB7zpiLzjKbF8E_IfynocouWHUnQ-_2y8w",
     });
+    //page 선택
+    url.searchParams.set("page", page); //&page=${page}
     //url 부르기
     let response = await fetch(url, { headers: header }); //ajax, http, fetch 등 사용가능
     //데이터 가져오기
     let data = await response.json();
     if (response.status == 200) {
-      if(data.total_hits == 0){
+      if (data.total_hits == 0) {
         throw new Error("검색된 결과가 없습니다.");
       }
       //데이터 보여주기
       news = data.articles;
+      total_pages = data.total_pages;
+      page = data.page;
       render();
+      pagination();
     } else {
       throw new Error(data.message);
     }
@@ -35,7 +42,7 @@ const getNews = async () => {
 
 const getLatestNews = async () => {
   url = new URL(
-    "https://api.newscatcherapi.com/v2/latest_headlines?countries=US&topic=sport&page_size=5"
+    "https://api.newscatcherapi.com/v2/latest_headlines?countries=KR&topic=sport&page_size=10"
   );
   getNews();
 };
@@ -86,6 +93,36 @@ const render = () => {
 const errorRender = (message) => {
   let errorHTML = `<div class="alert alert-danger text-center" role="alert">${message}</div>`;
   document.getElementById("news-board").innerHTML = errorHTML;
+};
+
+const pagination = () => {
+  let paginationHTML = "";
+  //알아야할 것: 전체 페이지 수, 현재 페이지, 페이지 그룹, 시작과 끝 페이지
+  let pageGroup = Math.ceil(page / 5);
+  let last = pageGroup * 5;
+  let first = last - 4;
+
+  paginationHTML = `<li class="page-item">
+  <a class="page-link" href="#" aria-label="Previous" onclick="moveToPage(${page-1})">
+    <span aria-hidden="true">&lt;</span>
+  </a>
+</li>`;
+  for (let i = first; i <= last; i++) {
+    paginationHTML += `<li class="page-item ${page == i ? "active" : ""}"><a class="page-link" href="#" onclick="moveToPage(${i})">${i}</a></li>`;
+  }
+  paginationHTML += `<li class="page-item">
+  <a class="page-link" href="#" aria-label="Next" onclick="moveToPage(${page+1})">
+    <span aria-hidden="true">&gt;</span>
+  </a>
+</li>`;
+  document.querySelector(".pagination").innerHTML = paginationHTML;
+};
+
+const moveToPage = (pageNum) => {
+  //이동하고싶은 페이지 알기
+  page = pageNum;
+  //그 페이지를 가지고 api 호출
+  getNews();
 };
 
 searchButton.addEventListener("click", getNewsByKeyword);
