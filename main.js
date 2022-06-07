@@ -139,5 +139,14 @@ const moveToPage = (pageNum) => {
   getNews();
 };
 
+const openSearchBox = () => {
+  let inputArea = document.getElementById("input-area");
+  if (inputArea.style.display === "inline") {
+    inputArea.style.display = "none";
+  } else {
+    inputArea.style.display = "inline";
+  }
+};
+
 searchButton.addEventListener("click", getNewsByKeyword);
 getLatestNews();
