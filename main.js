@@ -10,6 +10,7 @@ menus.forEach((menu) =>
   menu.addEventListener("click", (event) => getNewsByTopic(event))
 );
 
+//API를 이용해 데이터 가져와 뿌려주기
 const getNews = async () => {
   try {
     //헤더준비
@@ -40,6 +41,7 @@ const getNews = async () => {
   }
 };
 
+//API로 가장 최신뉴스 가져와 뿌려주기
 const getLatestNews = async () => {
   url = new URL(
     "https://api.newscatcherapi.com/v2/latest_headlines?countries=KR&topic=sport&page_size=10"
@@ -47,6 +49,7 @@ const getLatestNews = async () => {
   getNews();
 };
 
+//API로 선택한 topic주제 기사 가져와 뿌려주기
 const getNewsByTopic = async (event) => {
   let topic = event.target.textContent.toLowerCase();
   url = new URL(
@@ -55,6 +58,7 @@ const getNewsByTopic = async (event) => {
   getNews();
 };
 
+//API로 검색한 키워드 기사 가져와 뿌려주기
 const getNewsByKeyword = async () => {
   //검색 키워드 읽어오기
   let keyword = document.getElementById("search-input").value;
@@ -65,6 +69,7 @@ const getNewsByKeyword = async () => {
   getNews();
 };
 
+//화면에 각각의 기사 뿌려주기
 const render = () => {
   let newsHTML = "";
 
@@ -86,26 +91,29 @@ const render = () => {
     </div>`;
     })
     .join("");
-
   document.getElementById("news-board").innerHTML = newsHTML;
 };
 
+//오류발생시 원하는 에러메시지 출력
 const errorRender = (message) => {
   let errorHTML = `<div class="alert alert-danger text-center" role="alert">${message}</div>`;
   document.getElementById("news-board").innerHTML = errorHTML;
 };
 
+//화면 하단의 페이지네이션 구성
 const pagination = () => {
   let paginationHTML = "";
   //알아야할 것: 전체 페이지 수, 현재 페이지, 페이지 그룹, 시작과 끝 페이지
   let pageGroup = Math.ceil(page / 5);
   let last = pageGroup * 5;
+  
   if (last > total_pages) {
     //마지막 그룹이 5개 이하라면
     last = total_pages;
   }
   let first = last - 4 <= 0 ? 1 : last - 4; //첫 그룹이 5 이하라면
 
+  //좌측 화살표
   if (first >= 6) {
     paginationHTML = `<li class="page-item" onclick="moveToPage(1)">
                         <a class="page-link" href='#js-bottom'>&lt;&lt;</a>
@@ -114,12 +122,13 @@ const pagination = () => {
                         <a class="page-link" href='#js-bottom'>&lt;</a>
                       </li>`;
   }
+  //페이지 5개씩
   for (let i = first; i <= last; i++) {
     paginationHTML += `<li class="page-item ${i == page ? "active" : ""}" >
                         <a class="page-link" href='#js-bottom' onclick="moveToPage(${i})" >${i}</a>
                        </li>`;
   }
-
+  //우측 화살표
   if (last < total_pages) {
     paginationHTML += `<li class="page-item" onclick="moveToPage(${page + 1})">
                         <a  class="page-link" href='#js-program-detail-bottom'>&gt;</a>
@@ -132,6 +141,7 @@ const pagination = () => {
   document.querySelector(".pagination").innerHTML = paginationHTML;
 };
 
+//페이지네이션에 사용하는 선택된 페이지로 이동하기
 const moveToPage = (pageNum) => {
   //이동하고싶은 페이지 알기
   page = pageNum;
@@ -139,6 +149,7 @@ const moveToPage = (pageNum) => {
   getNews();
 };
 
+//검색아이콘을 통해 검색창 on/off
 const openSearchBox = () => {
   let inputArea = document.getElementById("input-area");
   if (inputArea.style.display === "inline") {
@@ -148,10 +159,12 @@ const openSearchBox = () => {
   }
 };
 
+//삼단메뉴바를 통한 토픽 열기
 const openNav = () => {
   document.getElementById("mySidenav").style.width = "250px";
 };
 
+//삼단메뉴바 닫기
 const closeNav = () => {
   document.getElementById("mySidenav").style.width = "0";
 };
